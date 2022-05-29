@@ -36,6 +36,23 @@ function install_brew_package() {
 if [ OsType == "Mac" ]	
 	install_brew();
 	install_brew_package "neovim"
+	# Install Neovim "Paq" plugin manager
+	echo "PAQ Installation"
+	git clone --depth=1 https://github.com/savq/paq-nvim.git \ 
+		"${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/paqs/start/paq-nvim;
+	echo "nvim config initialization"
+	if [ ! -d "~/.config" ]
+	then
+		echo "~/.config folder does not exist, creating it..."
+		mkdir ~/.config;
+	fi
+	if [! -d "~/.config/nvim"]
+	then
+		echo "~/.config nvim folder does not exist, creating it..."
+		mkdir ~/.config/nvim;
+	fi
+	touch ~/.config/nvim/init.lua;
+
 fi
 
 
