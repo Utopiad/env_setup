@@ -22,14 +22,14 @@ function install_brew() {
 }
 
 function install_brew_package() {
-	printf "Checking installation of package $1 via brew"
+	printf "Checking installation of package %s via brew" $1
 	brew ls --versions $1 > /dev/null;
 	if [echo $? != 0]
 	then
-		printf "Package $1 not installing. Proceding to installation..."
+		printf "Package %s not installed. Proceding to installation..." $1
 		brew install $1;
 	else
-		printf "Package $1 is already installed, skipping"
+		printf "Package %s is already installed, skipping" $1
 	fi
 }
 
