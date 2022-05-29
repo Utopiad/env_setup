@@ -21,11 +21,7 @@ function install_brew() {
 	fi
 }
 
-if [ OsType == "Mac" ]
-	install_brew();
-fi
-
-function check_installation_of_brew_package() {
+function install_brew_package() {
 	printf "Checking installation of package $1 via brew"
 	brew ls --versions $1 > /dev/null;
 	if [echo $? != 0]
@@ -33,10 +29,14 @@ function check_installation_of_brew_package() {
 		printf "Package $1 not installing. Proceding to installation..."
 		brew install $1;
 	else
-		printf "Package $1 is already installed"
+		printf "Package $1 is already installed, skipping"
 	fi
 }
 
-check_installation_of_brew_package "neovim"
+if [ OsType == "Mac" ]	
+	install_brew();
+	install_brew_package "neovim"
+fi
+
 
 
