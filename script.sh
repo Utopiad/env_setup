@@ -11,12 +11,14 @@ else
 fi
 
 function install_brew() {
-	which -s brew
+	which -s brewi >> /dev/null
 	if [[ $? != 0 ]]
 	then
 		# Install Homebrew
+		echo "Installing Homebrew as it's not installed yet"
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)";
 	else
+		echo "Launching homebrew update..."
 		brew update;
 	fi
 }
@@ -70,35 +72,9 @@ if [ OsType == "Mac" ]
 		echo "~/.config/nvim folder does not exist, creating it..."
 		mkdir ~/.config/nvim;
 	fi
-	touch ~/.config/nvim/init.lua;
-	mkdir ~/.config/nvim/lua;
-	touch ~/.config/nvim/lua/plugins.lua;
-	# Installing necessary dependencies beor
-	# Adds plugins to ~/.config/nvim/lua/plugins.lua
+	# Clones nvim config file repository from argument or mine from git@github.com:Utopiad/nvim_setup.git
 	echo "Adding plugins to ~/.config/nvim/lua/plugins.lua"
-	cat <> ~/.config/nvim/lua
-	require 'paq' {
-		'echasnovski/mini.nvim';
-		'gpanders/editorconfig.nvim';
-		'lilydjwg/colorizer';
-		'LucHermitte/lh-vim-lib';
-		'ludovicchabant/vim-gutentags';
-		{ 'neoclide/coc.nvim', branch = 'master', run = 'yarn install --frozen-lockfile' };
-		'nvim-lua/plenary.nvim';
-		'nvim-lualine/lualine.nvim';
-		'nvim-telescope/telescope.nvim';
-		'nvim-telescope/telescope-fzy-native.nvim';
-		{ 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' };
-		'preservim/nerdtree';
-		'preservim/nerdcommenter';
-		'ryanoasis/vim-devicons';
-		'sheerun/vim-polyglot';
-		'tanvirtin/vgit.nvim',
-		'tpope/vim-sensible';
-		'Yggdroot/indentLine';
-		'mattn/emmet-vim';
-	}
-	EOF
+	[[ $2 =~ (\.git)]] && git clone $2 ~/.config/nvim/ || git clone git@github.com:Utopiad/nvim_setup.git ~/.config.nvim/
 	# Install plugins
 	nvim --cmd PaqInstall ~/.config/nvim/lua/plugins.lua
 	# (TODO) Setup Cocvim installing necessary front-end dependencies
