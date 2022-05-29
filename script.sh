@@ -33,8 +33,27 @@ function install_brew_package() {
 	fi
 }
 
-if [ OsType == "Mac" ]	
-	install_brew();
+if [ OsType == "Mac" ]
+	# Needs to install nvm, npm and yarn before actually installing the plugins
+	echo "Check if nvm is installed"
+	nvm --version >> /dev/null;
+	if [ $? != 0]
+	then
+		echo "nvm not installing, proceeding..."
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash;
+		source ~/.zshrc;
+	fi
+	# Install and use node --lts version through nvm
+	echo "Installing node lts version through nvm"
+	nvm install --lts;
+	npm --version >> /dev/null;
+	if [ $? != 0]
+	then
+		echo "Insgalling yarn..."
+		npm install --global yarn;
+	fi
+
+	install_brew;
 	install_brew_package "neovim"
 	# Install Neovim "Paq" plugin manager
 	echo "PAQ Installation"
@@ -52,7 +71,37 @@ if [ OsType == "Mac" ]
 		mkdir ~/.config/nvim;
 	fi
 	touch ~/.config/nvim/init.lua;
-
+	mkdir ~/.config/nvim/lua;
+	touch ~/.config/nvim/lua/plugins.lua;
+	# Installing necessary dependencies beor
+	# Adds plugins to ~/.config/nvim/lua/plugins.lua
+	echo "Adding plugins to ~/.config/nvim/lua/plugins.lua"
+	cat <> ~/.config/nvim/lua
+	require 'paq' {
+		'echasnovski/mini.nvim';
+		'gpanders/editorconfig.nvim';
+		'lilydjwg/colorizer';
+		'LucHermitte/lh-vim-lib';
+		'ludovicchabant/vim-gutentags';
+		{ 'neoclide/coc.nvim', branch = 'master', run = 'yarn install --frozen-lockfile' };
+		'nvim-lua/plenary.nvim';
+		'nvim-lualine/lualine.nvim';
+		'nvim-telescope/telescope.nvim';
+		'nvim-telescope/telescope-fzy-native.nvim';
+		{ 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' };
+		'preservim/nerdtree';
+		'preservim/nerdcommenter';
+		'ryanoasis/vim-devicons';
+		'sheerun/vim-polyglot';
+		'tanvirtin/vgit.nvim',
+		'tpope/vim-sensible';
+		'Yggdroot/indentLine';
+		'mattn/emmet-vim';
+	}
+	EOF
+	# Install plugins
+	nvim --cmd PaqInstall ~/.config/nvim/lua/plugins.lua
+	# (TODO) Setup Cocvim installing necessary front-end dependencies
 fi
 
 
