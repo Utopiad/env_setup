@@ -48,7 +48,7 @@ if [ OsType == "Mac" ]
 	fi
 	if [! -d "~/.config/nvim"]
 	then
-		echo "~/.config nvim folder does not exist, creating it..."
+		echo "~/.config/nvim folder does not exist, creating it..."
 		mkdir ~/.config/nvim;
 	fi
 	touch ~/.config/nvim/init.lua;
