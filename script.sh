@@ -1,83 +1,105 @@
 #!/usr/bin/env bash
 
-echo "hello world!!"
+# Formats
+Bold="\e[1m"
+Underlined="\e[4m"
+# Resets all attributes, NoColor
+NC="\e[0m"
 
+# Colors
+Err="\e[91m"
+Success="\e[92m"
+Warning="\e[93m"
+Info="\e[96m"
+
+
+# Determining what OS is this program being run under
 OsType=""
-if [ $(uname) == "Darwin" ]
+if [[ $(uname) == "Darwin" ]]
 then
 	OsType="Mac"
 else
 	OsType=$(uname)	
 fi
 
+printf "${Bold}Your os is ${OsType}${NC}\n"
+
 function install_brew() {
-	which -s brewi >> /dev/null
+	which -s brew >> /dev/null
 	if [[ $? != 0 ]]
 	then
 		# Install Homebrew
-		echo "Installing Homebrew as it's not installed yet"
+		printf "${Bold}${Info}Installing Homebrew as it's not installed yet${NC}\n"
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)";
 	else
-		echo "Launching homebrew update..."
+		printf "${Bold}Launching homebrew update...${NC}\n"
 		brew update;
 	fi
 }
 
 function install_brew_package() {
-	printf "Checking installation of package %s via brew" $1
-	brew ls --versions $1 > /dev/null;
-	if [echo $? != 0]
+	printf "${Bold}${Info}Checking installation of package %s via brew${NC}\n" $1
+	brew ls --versions $1 >> /dev/null;
+	if [[ $? != 0 ]]
 	then
-		printf "Package %s not installed. Proceding to installation..." $1
+		printf "Package %s not installed. Proceding to installation...\n" $1
 		brew install $1;
 	else
-		printf "Package %s is already installed, skipping" $1
+		printf "${Bold}${Warning}Package %s is already installed, skipping${NC}\n" $1
 	fi
 }
 
-if [ OsType == "Mac" ]
+if [[ $OsType == "Mac" ]]
+then
 	# Needs to install nvm, npm and yarn before actually installing the plugins
-	echo "Check if nvm is installed"
+	printf "${Bold}Check if nvm is installed${NC}\n"
 	nvm --version >> /dev/null;
-	if [ $? != 0]
+	if [[ $? != 0 ]]
 	then
-		echo "nvm not installing, proceeding..."
+		printf "${Bold}${Info}nvm not installed, proceeding...${NC}\n"
 		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash;
 		source ~/.zshrc;
 	fi
 	# Install and use node --lts version through nvm
-	echo "Installing node lts version through nvm"
+	printf "${Bold}${Info}Installing node lts version through nvm${NC}\n"
 	nvm install --lts;
 	npm --version >> /dev/null;
-	if [ $? != 0]
+	if [[ $? != 0 ]]
 	then
-		echo "Insgalling yarn..."
+		printf "${Bold}${Info}Installing yarn...${NC}\n"
 		npm install --global yarn;
 	fi
 
 	install_brew;
 	install_brew_package "neovim"
 	# Install Neovim "Paq" plugin manager
-	echo "PAQ Installation"
+	printf "${Bold}${Info}PAQ Installation${NC}\n"
 	git clone --depth=1 https://github.com/savq/paq-nvim.git \ 
 		"${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/paqs/start/paq-nvim;
-	echo "nvim config initialization"
-	if [ ! -d "~/.config" ]
+	printf "${Bold}${Info}nvim config initialization${NC}\n"
+	if [[ ! -d "~/.config" ]]
 	then
-		echo "~/.config folder does not exist, creating it..."
+		printf "${Bold}${Info} ~/.config folder does not exist, creating it...${NC}\n"
 		mkdir ~/.config;
 	fi
-	if [! -d "~/.config/nvim"]
+	if [[ ! -d "~/.config/nvim" ]]
 	then
-		echo "~/.config/nvim folder does not exist, creating it..."
+		printf "${Bold}${Info} ~/.config/nvim folder does not exist, creating it...${NC}\n"
 		mkdir ~/.config/nvim;
 	fi
 	# Clones nvim config file repository from argument or mine from git@github.com:Utopiad/nvim_setup.git
-	echo "Adding plugins to ~/.config/nvim/lua/plugins.lua"
-	[[ $2 =~ (\.git)]] && git clone $2 ~/.config/nvim/ || git clone git@github.com:Utopiad/nvim_setup.git ~/.config.nvim/
-	# Install plugins
-	nvim --cmd PaqInstall ~/.config/nvim/lua/plugins.lua
+	printf "${Bold}${Info}Adding plugins to ~/.config/nvim/lua/plugins.lua${NC}\n"
+	if [[ $2 =~ (\.git) ]]
+	then
+ 		git clone $2 ~/.config/nvim/
+	else 
+		git clone git@github.com:Utopiad/nvim_setup.git ~/.config/nvim/
+	fi
+	# # Install plugins
+	# nvim --cmd PaqInstall ~/.config/nvim/lua/plugins.lua;
 	# (TODO) Setup Cocvim installing necessary front-end dependencies
+else
+	printf "${Bold}${Info}not MacOS${NC}\n"
 fi
 
 
